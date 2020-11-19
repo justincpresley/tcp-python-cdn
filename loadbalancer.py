@@ -6,16 +6,13 @@ from utils.packet_functions import *
 from utils.basic_functions import *
 import threading
 
-# Logging setup
-logging.basicConfig(level=logging.NOTSET,filename=logpath,filemode='w',format='%(message)s')
-
 class ClientThread(threading.Thread):
     def __init__(self,ip,port,socket):
         threading.Thread.__init__(self)
         self.ip = ip
         self.port = port
         self.socket = socket
-        print "[+] New thread started for "+ip+":"+str(port)
+        logging.info(f'[+] New thread started for {ip}, {str(port)}')
     def kill(self):
         self.socket.close()
     def run(self):
@@ -38,6 +35,9 @@ def main():
     optionalArgs.add_argument("-h","--help",action="help",default=SUPPRESS,help="show this help message and exit")
     # Getting All arguments
     args = vars(parser.parse_args())
+
+    # Logging setup
+    logging.basicConfig(level=logging.NOTSET,filename=logpath,filemode='w',format='%(message)s')
 
     # Relaying ALL arguments into variables
     if args["port"] < 0 or args["port"] > 65535:
