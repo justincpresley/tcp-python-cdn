@@ -46,7 +46,6 @@ def main():
     # Communications
     logging.info(f'Client: starting to communicate')
     try:
-        send_packet(sourceSock, form_packet(12345,0,b'',syn=True))
         while True:
             string = "HELLO"
             time.sleep(10)
