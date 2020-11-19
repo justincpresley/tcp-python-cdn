@@ -37,6 +37,7 @@ def main():
     args = vars(parser.parse_args())
 
     # Logging setup
+    logpath = str(args["logfile"])
     logging.basicConfig(level=logging.NOTSET,filename=logpath,filemode='w',format='%(message)s')
 
     # Relaying ALL arguments into variables
@@ -46,8 +47,6 @@ def main():
 
     servers_file = args["servers"]
     port = int(args["port"])
-    logpath = str(args["logfile"])
-
 
     # Load Balancer Setup
     logging.info(f'LoadBalancer: starting socket')
