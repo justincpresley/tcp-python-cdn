@@ -48,8 +48,8 @@ def main():
     try:
         while True:
             string = "HELLO"
-            time.sleep(10)
             send_packet(sourceSock, form_packet(12345,0,string.encode(),syn=True))
+            time.sleep(30)
 
 
     finally:

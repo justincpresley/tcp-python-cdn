@@ -13,15 +13,12 @@ class ClientThread(threading.Thread):
         self.port = port
         self.socket = socket
         logging.info(f'[+] New thread started for {ip}, {str(port)}')
-    def kill(self):
-        self.socket.close()
     def run(self):
-        try:
-            while True:
+        while True:
                 packet = receive_packet(self.socket)
-                logging.info(f'{ip} said {payload_from_packet(packet).decode()}')
-        except:
-            self.kill()
+                logging.info(f'{self.ip} said {payload_from_packet(packet).decode()}')
+
+        self.socket.close()
 
 def main():
     # Command line parser
@@ -57,12 +54,18 @@ def main():
     sourceSock.listen(10)
 
     # Communications
+    threads = []
     while True:
-        (clientsock, (ip, port)) = sourceSock.accept()
-        newthread = ClientThread(ip, port, clientsock)
-        newthread.start()
-        threads.append(newthread)
+        try:
+            (clientsock, (ip, port)) = sourceSock.accept()
+            newthread = ClientThread(ip, port, clientsock)
+            newthread.start()
+            threads.append(newthread)
+        except KeyboardInterrupt:
+            break
 
+    for t in threads:
+        t.join()
     sourceSock.close()
 
 if __name__ == '__main__':
