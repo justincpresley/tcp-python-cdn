@@ -43,7 +43,7 @@ def main():
 
     # Load Balancer Setup
     logging.info(f'LoadBalancer: starting socket')
-    sourceSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sourceSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sourceSock.bind(('localhost',port))
 
     logging.info(f'LoadBalancer: socket listening')
@@ -54,7 +54,7 @@ def main():
         c, addr = sourceSock.accept()
         logging.info('Connected to: ' + address[0] + ':' + str(address[1]))
         print_lock.acquire()
-        start_new_thread(multi_threaded_client, (c,)) 
+        start_new_thread(multi_threaded_client, (c,))
 
     sourceSock.close()
 

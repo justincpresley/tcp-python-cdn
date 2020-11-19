@@ -39,7 +39,7 @@ def main():
 
     # Client Setup
     logging.info(f'Client: starting socket')
-    sourceSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sourceSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     contactSock = (server, port)
     sourceSock.connect(contactSock)
 
