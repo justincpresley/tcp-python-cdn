@@ -10,14 +10,14 @@ def startServer(server, port):
         logging.info(f'Server: starting socket')
         sourceSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         logging.info(f'Server: binding socket')
-        serverSock.bind((server, port))
+        sourceSock.bind((server, port))
         logging.info(f'Server: binded socket')
-        serverSock.listen(10)
-        return serverSock
-    except serverSock.error as msg:
+        sourceSock.listen(10)
+        return sourceSock
+    except sourceSock.error as msg:
         print ('Bind failed. Error Code: ' + str(msg[0]) + 'ERROR: ' + msg[1])
         try:
-            serverSock.exit
+            sourceSock.exit
         except:
             pass
 
