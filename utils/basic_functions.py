@@ -79,3 +79,6 @@ def push_bytes_to_file(filename, bytes):
     f.seek(0, os.SEEK_END)
     f.write(bytearray(bytes))
     f.close()
+
+def file_into_list(file):
+    return open(file,'r').read().splitlines()

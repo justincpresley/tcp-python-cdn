@@ -46,16 +46,13 @@ def main():
     # Communications
     logging.info(f'Client: starting to communicate')
     try:
-        while True:
-            string = "HELLO"
-            send_packet(sourceSock, form_packet(12345,0,string.encode(),syn=True))
-            time.sleep(30)
-
-
+        packet = receive_packet(sourceSock)
+        logging.info(f'Client: recieved {payload_from_packet(packet).decode()}')
     finally:
     # Close Socket
         logging.info(f'Client: stopping socket')
         close_socket(sourceSock)
+
 
 if __name__ == '__main__':
     main()

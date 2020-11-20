@@ -6,6 +6,27 @@ from utils.packet_functions import *
 from utils.basic_functions import *
 import threading
 
+server_map = {}
+
+def update_server_map():
+    global server_map
+    pass
+
+def find_best_server_ip():
+    global server_map
+    best_ip = "0.0.0.0"
+    best_pref = 0.0
+    for key in server_map:
+        if server_map[key] != 0.0:
+            if best_ip != 0.00:
+                if server_map[key] > best_pref:
+                    best_pref = server_map[key]
+                    best_ip = key
+            else:
+                best_pref = server_map[key]
+                best_ip = key
+    return best_ip
+
 class ClientThread(threading.Thread):
     def __init__(self,ip,port,socket):
         threading.Thread.__init__(self)
@@ -14,11 +35,21 @@ class ClientThread(threading.Thread):
         self.socket = socket
         logging.info(f'[+] New thread started for {ip}, {str(port)}')
     def run(self):
-        while True:
-                packet = receive_packet(self.socket)
-                logging.info(f'{self.ip} said {payload_from_packet(packet).decode()}')
-
+        best_ip = find_best_server_ip()
+        data = best_ip.encode('utf-8')
+        send_packet(self.socket, form_packet(1,1,data,syn=True))
         self.socket.close()
+        logging.info(f'[-] Thread ended for {ip}, {str(port)}')
+
+class PingThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        logging.info(f'[+] New thread started for pinging the servers')
+    def run(self):
+        try:
+            while True:
+                update_server_map()
+                time.sleep(10) # in seconds how long to wait
 
 def main():
     # Command line parser
@@ -44,6 +75,16 @@ def main():
 
     servers_file = args["servers"]
     port = int(args["port"])
+    list_of_servers = file_into_list(servers_file)
+
+    # Make the complex mapping from server list
+    global server_map
+    for ip in list_of_servers:
+        server_map[ip] = [0.00]
+
+    # Create a thread to ping and manage servers
+    pthread = PingThread()
+    pthread.start()
 
     # Load Balancer Setup
     logging.info(f'LoadBalancer: starting socket')
@@ -54,17 +95,19 @@ def main():
     sourceSock.listen(10)
 
     # Communications
-    threads = []
+    cthreads = []
     while True:
         try:
             (clientsock, (ip, port)) = sourceSock.accept()
             newthread = ClientThread(ip, port, clientsock)
             newthread.start()
-            threads.append(newthread)
+            cthreads.append(newthread)
         except KeyboardInterrupt:
             break
 
-    for t in threads:
+    pthread.raise_exception()
+    pthread.join()
+    for t in cthreads:
         t.join()
     sourceSock.close()
 
