@@ -12,16 +12,9 @@ def delete_file_in_cwd(filename):
         os.remove(filename)
 
 # ip functions
-regex = '''^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(
-            25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(
-            25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(
-            25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$'''
-
-def validate_ip(ip):
-    if(re.search(regex, ip)):
-        return True
-    else:
-        return False
+def is_valid_ip(ip):
+    m = re.match(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$", ip)
+    return bool(m) and all(map(lambda n: 0 <= int(n) <= 255, m.groups()))
 
 # url functions
 def make_proper_url(url):

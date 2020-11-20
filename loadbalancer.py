@@ -50,7 +50,9 @@ class PingThread(threading.Thread):
             while True:
                 update_server_map()
                 time.sleep(10) # in seconds how long to wait
-
+        finally:
+            pass
+    
 def main():
     # Command line parser
     parser = ArgumentParser(add_help=False,description="Ping a port on a certain network")
