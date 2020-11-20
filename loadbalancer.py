@@ -12,7 +12,6 @@ def update_server_map():
     global server_map
     for key in server_map:
         server_map[key] = 1.0
-        logging.info(f'servermap {key} now is 1.0')
 
 def find_best_server_ip():
     global server_map
@@ -38,9 +37,6 @@ class ClientThread(threading.Thread):
         logging.info(f'[+] New thread started for {self.ip}, {str(self.port)}')
     def run(self):
         best_ip = find_best_server_ip()
-        while best_ip=="0.0.0.0":
-            time.sleep(5)
-            best_ip = find_best_server_ip()
         data = best_ip.encode('utf-8')
         send_packet(self.socket, form_packet(1,1,data,syn=True))
         self.socket.close()
@@ -84,6 +80,7 @@ def main():
     servers_file = args["servers"]
     port = int(args["port"])
     list_of_servers = file_into_list(servers_file)
+    logging.info(f'Avaliable Servers from Log: {list_of_servers}')
 
     # Make the complex mapping from server list
     global server_map
