@@ -10,7 +10,8 @@ server_map = {}
 
 def update_server_map():
     global server_map
-    pass
+    for key in server_map:
+        server_map[key] = 1.0
 
 def find_best_server_ip():
     global server_map
@@ -33,13 +34,13 @@ class ClientThread(threading.Thread):
         self.ip = ip
         self.port = port
         self.socket = socket
-        logging.info(f'[+] New thread started for {ip}, {str(port)}')
+        logging.info(f'[+] New thread started for {self.ip}, {str(self.port)}')
     def run(self):
         best_ip = find_best_server_ip()
         data = best_ip.encode('utf-8')
         send_packet(self.socket, form_packet(1,1,data,syn=True))
         self.socket.close()
-        logging.info(f'[-] Thread ended for {ip}, {str(port)}')
+        logging.info(f'[-] Thread ended for {self.ip}, {str(self.port)}')
 
 class PingThread(threading.Thread):
     def __init__(self):
@@ -52,7 +53,7 @@ class PingThread(threading.Thread):
                 time.sleep(10) # in seconds how long to wait
         finally:
             pass
-    
+
 def main():
     # Command line parser
     parser = ArgumentParser(add_help=False,description="Ping a port on a certain network")
@@ -82,7 +83,7 @@ def main():
     # Make the complex mapping from server list
     global server_map
     for ip in list_of_servers:
-        server_map[ip] = [0.00]
+        server_map[ip] = 0.00
 
     # Create a thread to ping and manage servers
     pthread = PingThread()
@@ -111,7 +112,7 @@ def main():
     pthread.join()
     for t in cthreads:
         t.join()
-    sourceSock.close()
+    close_socket(sourceSock)
 
 if __name__ == '__main__':
     main()

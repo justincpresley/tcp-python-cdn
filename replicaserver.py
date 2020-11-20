@@ -7,10 +7,11 @@ from utils.basic_functions import *
 def startServer(server, port):
     try:
         logging.info(f'Server: starting socket')
-        serverSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sourceSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         logging.info(f'Server: binding socket')
         serverSock.bind((server, port))
         logging.info(f'Server: binded socket')
+        serverSock.listen(10)
         return serverSock
     except serverSock.error as msg:
         print ('Bind failed. Error Code: ' + str(msg[0]) + 'ERROR: ' + msg[1])
@@ -18,34 +19,33 @@ def startServer(server, port):
             serverSock.exit
         except:
             pass
-def receive_and_send(serverSock, clientSock, syn_num, ack_num, payload, syn=False, ack=False, fin=False):
-    while True:
-        serverSock.settimeout(0.5)
-        try:
-            packet, addr = receive_packet_and_addr(serverSock)
-            logging.info(f'RECV   {syn_num} {ack_num} ACK={"Y "if ack else "N"} SYN={"Y" if syn else "N"} FIN={"Y" if fin else "N"}')
-            if seq_num_from_packet(packet) != ack_num:
-                raise socket.timeout
-            break
-        except socket.timeout as e:
-            send_packet(serverSock, clientSock, form_packet(syn_num, ack_num, b'', syn=syn, ack=ack, fin=fin))
-            logging.info(f'RETRAN {syn_num} {ack_num} ACK={"Y "if ack else "N"} SYN={"Y" if syn else "N"} FIN={"Y" if fin else "N"}')
-            pass
-    return (packet, addr)
-def on_client(serverSock, packet, clientSock, num_packets, cached_file):
-    send_packet(serverSock, clientSock, form_packet(100, seq_num_from_packet(packet)+1,b'', syn=True, ack=True))
-    logging.info(f'SEND   {100} {seq_num_from_packet(packet)+1} ACK={"Y "if True else "N"} SYN={"Y" if True else "N"} FIN={"Y" if False else "N"}')
-    packet, addr = receive_and_send(serverSock, clientSock, 100, seq_num_from_packet(packet)+1, b'', syn=True, ack=True)
 
-    for x in range(num_packets):
-        bytes = read_bytes_chunk_from_file(cached_file, chunk_size=512, chunk=x)
-        if x<(num_packets-1):
-            send_packet(serverSock, clientSock, form_packet(ack_num_from_packet(packet), seq_num_from_packet(packet)+1,bytes, syn=True))
-            logging.info(f'SEND   {ack_num_from_packet(packet)} {seq_num_from_packet(packet)+1} ACK={"Y "if False else "N"} SYN={"Y" if True else "N"} FIN={"Y" if False else "N"}')
-            packet, clientSock = receive_and_send(serverSock, clientSock, ack_num_from_packet(packet), seq_num_from_packet(packet)+1, bytes, syn=True)
-        else:
-            send_packet(serverSock, clientSock, form_packet(ack_num_from_packet(packet), seq_num_from_packet(packet)+1,bytes, syn=True, fin=True))
-            logging.info(f'SEND   {ack_num_from_packet(packet)} {seq_num_from_packet(packet)+1} ACK={"Y "if False else "N"} SYN={"Y" if True else "N"} FIN={"Y" if True else "N"}')
+class ClientThread(threading.Thread):
+    def __init__(self,ip,port,socket,num_packets,filename):
+        threading.Thread.__init__(self)
+        self.ip = ip
+        self.port = port
+        self.socket = socket
+        self.num_packets = num_packets
+        self.filename = filename
+        logging.info(f'[+] New thread started for {self.ip}, {str(self.port)}')
+    def run(self):
+        packet = receive_packet(self.socket)
+        for x in range(self.num_packets):
+            bytes = read_bytes_chunk_from_file(self.filename, chunk_size=512, chunk=x)
+            if x<(self.num_packets-1):
+                send_packet(self.socket,form_packet(ack_num_from_packet(packet), seq_num_from_packet(packet)+1,bytes, syn=True))
+                logging.info(f'SEND   {ack_num_from_packet(packet)} {seq_num_from_packet(packet)+1} ACK={"Y "if False else "N"} SYN={"Y" if True else "N"} FIN={"Y" if False else "N"}')
+                packet = receive_packet(self.socket)
+                logging.info(f'RECV   {syn_num} {ack_num} ACK={"Y "if ack else "N"} SYN={"Y" if syn else "N"} FIN={"Y" if fin else "N"}')
+            else:
+                send_packet(self.socket,form_packet(ack_num_from_packet(packet), seq_num_from_packet(packet)+1,bytes, syn=True, fin=True))
+                logging.info(f'SEND   {ack_num_from_packet(packet)} {seq_num_from_packet(packet)+1} ACK={"Y "if False else "N"} SYN={"Y" if True else "N"} FIN={"Y" if True else "N"}')
+                packet = receive_packet(self.socket)
+                logging.info(f'RECV   {syn_num} {ack_num} ACK={"Y "if ack else "N"} SYN={"Y" if syn else "N"} FIN={"Y" if fin else "N"}')
+
+        self.socket.close()
+        logging.info(f'[-] Thread ended for {self.ip}, {str(self.port)}')
 
 def main():
     # Command line parser
@@ -80,15 +80,23 @@ def main():
     num_packets = how_many_chunks_in_file(cached_file, chunk_size=PacketSizes.BODY.value)
 
     # Server start
-    serverSock = startServer(server, port)
+    serverSock = startServer('', port)
 
     # Start communicating
     logging.info(f'Server: listening')
+    cthreads = []
     while True:
-        serverSock.settimeout(None)
-        packet, addr = receive_packet_and_addr(serverSock)
-        logging.info(f'RECV   {seq_num_from_packet(packet)} {ack_num_from_packet(packet)} ACK={"Y "if ack_flag_from_packet(packet) else "N"} SYN={"Y" if syn_flag_from_packet(packet) else "N"} FIN={"Y" if fin_flag_from_packet(packet) else "N"}')
-        on_client(serverSock, packet, addr, num_packets, cached_file)
+        try:
+            (clientsock, (ip, port)) = sourceSock.accept()
+            newthread = ClientThread(ip, port, clientsock, num_packets, cached_file)
+            newthread.start()
+            cthreads.append(newthread)
+        except KeyboardInterrupt:
+            break
+
+    for t in cthreads:
+        t.join()
+    sourceSock.close()
 
     # Close Socket
     close_socket(serverSock)

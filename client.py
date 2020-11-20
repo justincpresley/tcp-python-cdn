@@ -37,20 +37,54 @@ def main():
     # Logging setup
     logging.basicConfig(level=logging.NOTSET,filename=logpath,filemode='w',format='%(message)s')
 
-    # Client Setup
-    logging.info(f'Client: starting socket')
+    # Client setup
+    logging.info(f'Client: starting socket to load balancer')
     sourceSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     contactSock = (server, port)
     sourceSock.connect(contactSock)
 
     # Communications
+    pref_server_ip = "0.0.0.0"
     logging.info(f'Client: starting to communicate')
     try:
         packet = receive_packet(sourceSock)
-        logging.info(f'Client: recieved {payload_from_packet(packet).decode()}')
+        pref_server_ip = payload_from_packet(packet).decode()
+        logging.info(f'Client: received {pref_server_ip}')
     finally:
-    # Close Socket
-        logging.info(f'Client: stopping socket')
+    # Close socket
+        logging.info(f'Client: stopping socket to load balancer')
+        close_socket(sourceSock)
+
+    if pref_server_ip == "0.0.0.0" or pref_server_ip == "":
+        logging.info(f'Load Balancer could not connect to any servers, ty again later.')
+        exit()
+
+    # Client setup
+    logging.info(f'Client: starting socket to prefered server')
+    sourceSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    contactSock = (pref_server_ip, port)
+    sourceSock.connect(contactSock)
+
+    # Communications
+    try:
+        logging.info(f'Client: starting to communicate')
+        send_packet(sourceSock, form_packet(12345,0,b'',syn=True))
+        logging.info(f'SEND   {12345} {0} ACK={"Y "if False else "N"} SYN={"Y" if True else "N"} FIN={"Y" if False else "N"}')
+        flag = False
+        while not flag:
+            packet = receive_packet(sourceSock)
+            logging.info(f'RECV   {ack_num_from_packet(packet)} {seq_num_from_packet(packet)+sys.getsizeof(payload_from_packet(packet))} ACK={"Y "if True else "N"} SYN={"Y" if False else "N"} FIN={"Y" if False else "N"}')
+            push_bytes_to_file(webpage,payload_from_packet(packet))
+
+            if not fin_flag_from_packet(packet):
+                send_packet(sourceSock, form_packet(ack_num_from_packet(packet), seq_num_from_packet(packet)+sys.getsizeof(payload_from_packet(packet)),b'',ack=True))
+            else:
+                flag = True
+                send_packet(sourceSock, form_packet(ack_num_from_packet(packet), seq_num_from_packet(packet)+sys.getsizeof(payload_from_packet(packet)),b'',ack=True, fin=True))
+            logging.info(f'SEND   {ack_num_from_packet(packet)} {seq_num_from_packet(packet)+sys.getsizeof(payload_from_packet(packet))} ACK={"Y "if True else "N"} SYN={"Y" if False else "N"} FIN={"Y" if True else "N"}')
+    finally:
+    # Close socket
+        logging.info(f'Client: stopping socket to prefered server')
         close_socket(sourceSock)
 
 
