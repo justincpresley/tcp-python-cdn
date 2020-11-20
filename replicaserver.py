@@ -88,7 +88,7 @@ def main():
     cthreads = []
     while True:
         try:
-            (clientsock, (ip, port)) = sourceSock.accept()
+            (clientsock, (ip, port)) = serverSock.accept()
             newthread = ClientThread(ip, port, clientsock, num_packets, cached_file)
             newthread.start()
             cthreads.append(newthread)
@@ -97,7 +97,7 @@ def main():
 
     for t in cthreads:
         t.join()
-    sourceSock.close()
+    serverSock.close()
 
     # Close Socket
     close_socket(serverSock)
