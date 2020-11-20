@@ -53,6 +53,7 @@ class PingThread(threading.Thread):
     def run(self):
         try:
             while True:
+                logging.info(f'Loop for pinging has ran')
                 update_server_map()
                 time.sleep(10) # in seconds how long to wait
         finally:
