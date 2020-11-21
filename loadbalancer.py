@@ -2,6 +2,7 @@ from argparse import ArgumentParser, SUPPRESS
 import socket
 import logging
 import time
+import ctypes
 from utils.packet_functions import *
 from utils.basic_functions import *
 import threading
@@ -45,28 +46,18 @@ class ClientThread(threading.Thread):
 class PingThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
+        self.run = True
         logging.info(f'[+] New thread started for pinging the servers')
     def run(self):
         try:
-            while True:
+            while self.run:
                 update_server_map()
                 logging.info(f'Server Preferences are Updated')
                 time.sleep(10) # in seconds how long to wait
         finally:
             pass
-    def get_id(self):
-        if hasattr(self, '_thread_id'):
-            return self._thread_id
-        for id, thread in threading._active.items():
-            if thread is self:
-                return id
-    def raise_exception(self):
-        thread_id = self.get_id()
-        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id,
-              ctypes.py_object(SystemExit))
-        if res > 1:
-            ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
-            print('Exception raise failure')
+    def stop(self):
+        self.run = False
 
 def main():
     # Command line parser
@@ -123,7 +114,7 @@ def main():
         except KeyboardInterrupt:
             break
 
-    pthread.raise_exception()
+    pthread.stop()
     pthread.join()
     for t in cthreads:
         t.join()
