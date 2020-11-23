@@ -73,5 +73,9 @@ def push_bytes_to_file(filename, bytes):
     f.write(bytearray(bytes))
     f.close()
 
+# list functions
 def file_into_list(file):
     return open(file,'r').read().splitlines()
+
+def dickeys_into_list(dic):
+    return list(dict.keys()) 

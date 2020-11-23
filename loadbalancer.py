@@ -3,6 +3,8 @@ import socket
 import logging
 import time
 import ctypes
+import subprocess
+import re
 from utils.packet_functions import *
 from utils.basic_functions import *
 import threading
@@ -11,8 +13,40 @@ server_map = {}
 
 def update_server_map():
     global server_map
-    for key in server_map:
-        server_map[key] = 1.0
+	IPAddresses = dickeys_into_list(server_map)
+	fileOut = "Pingout.dat"
+	fileErr = "Pingerr.dat"
+	logging.info('PingThread: IPs: ' + str(IPAddresses))
+
+	# Ping All the Addresses
+	with open(fileOut,"wb") as out, open(fileErr,"wb") as err:
+		for i in range(len(IPAddresses)):
+			subprocess.run('ping -c 4 ' + IPAddresses[i], stdout=out, stderr=err, shell=True)
+
+	# Finding All the Losses
+	lossArray = []
+	pattern = re.compile('received, ')
+	for line in open(fileOut):
+		for match in re.finditer(pattern, line):
+			lossArray.append(line.split('received, ')[1].split('%')[0])
+	loss = [int(i) for i in lossArray]
+	logging.info('PingThread: losses (as int):  ' + str(loss))
+
+	# Finding All the Average Times
+	avgTimeArray = []
+	pattern = re.compile(', time ')
+	for line in open(fileOut):
+		for match in re.finditer(pattern, line):
+			avgTimeArray.append(line.split(', time ')[1].split('ms')[0])
+	avgTime = [int(i) for i in avgTimeArray]
+	logging.info('PingThread: Avg response time (in ms): ' + str(avgTime))
+
+	# Updating All the Preferences
+	for key in server_map:
+		server_map[key] = (0.75*loss[IPAddresses.index(key)]) + (0.25*avgTime[IPAddresses.index(key)])
+
+	delete_file_in_cwd(fileErr)
+	delete_file_in_cwd(fileOut)
 
 def find_best_server_ip():
     global server_map
@@ -21,7 +55,7 @@ def find_best_server_ip():
     for key in server_map:
         if server_map[key] != 0.0:
             if best_ip != 0.00:
-                if server_map[key] > best_pref:
+                if server_map[key] < best_pref:
                     best_pref = server_map[key]
                     best_ip = key
             else:
@@ -38,6 +72,9 @@ class ClientThread(threading.Thread):
         logging.info(f'[+] New thread started for {self.ip}, {str(self.port)}')
     def run(self):
         best_ip = find_best_server_ip()
+        while best_ip=="0.0.0.0":
+            time.sleep(5)
+            best_ip = find_best_server_ip()
         data = best_ip.encode('utf-8')
         send_packet(self.socket, form_packet(1,1,data,syn=True))
         self.socket.close()
@@ -46,18 +83,19 @@ class ClientThread(threading.Thread):
 class PingThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        self.run = True
+        self.running = True
         logging.info(f'[+] New thread started for pinging the servers')
     def run(self):
         try:
-            while self.run:
+            while self.running:
                 update_server_map()
-                logging.info(f'Server Preferences are Updated')
+                logging.info(f'PingThread: Server Preferences are Updated')
+                logging.info(f'PingThread: {server_map}')
                 time.sleep(10) # in seconds how long to wait
         finally:
             pass
     def stop(self):
-        self.run = False
+        self.runing = False
 
 def main():
     # Command line parser
