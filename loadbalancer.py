@@ -12,41 +12,41 @@ import threading
 server_map = {}
 
 def update_server_map():
+    logging.info(f'---')
     global server_map
-	IPAddresses = dickeys_into_list(server_map)
-	fileOut = "Pingout.dat"
-	fileErr = "Pingerr.dat"
-	logging.info('PingThread: IPs: ' + str(IPAddresses))
+    IPAddresses = dickeys_into_list(server_map)
+    fileOut = "Pingout.dat"
+    fileErr = "Pingerr.dat"
 
-	# Ping All the Addresses
-	with open(fileOut,"wb") as out, open(fileErr,"wb") as err:
-		for i in range(len(IPAddresses)):
-			subprocess.run('ping -c 4 ' + IPAddresses[i], stdout=out, stderr=err, shell=True)
+    # Ping All the Addresses
+    with open(fileOut,"wb") as out, open(fileErr,"wb") as err:
+        for i in range(len(IPAddresses)):
+		    subprocess.run('ping -c 4 ' + IPAddresses[i], stdout=out, stderr=err, shell=True)
 
-	# Finding All the Losses
-	lossArray = []
-	pattern = re.compile('received, ')
-	for line in open(fileOut):
-		for match in re.finditer(pattern, line):
-			lossArray.append(line.split('received, ')[1].split('%')[0])
-	loss = [int(i) for i in lossArray]
-	logging.info('PingThread: losses (as int):  ' + str(loss))
+    # Finding All the Losses
+    lossArray = []
+    pattern = re.compile('received, ')
+    for line in open(fileOut):
+	    for match in re.finditer(pattern, line):
+	        lossArray.append(line.split('received, ')[1].split('%')[0])
+    loss = [int(i) for i in lossArray]
+    logging.info('PingThread: losses (as int):  ' + str(loss))
 
-	# Finding All the Average Times
-	avgTimeArray = []
-	pattern = re.compile(', time ')
-	for line in open(fileOut):
-		for match in re.finditer(pattern, line):
-			avgTimeArray.append(line.split(', time ')[1].split('ms')[0])
-	avgTime = [int(i) for i in avgTimeArray]
-	logging.info('PingThread: Avg response time (in ms): ' + str(avgTime))
+    # Finding All the Average Times
+    avgTimeArray = []
+    pattern = re.compile(', time ')
+    for line in open(fileOut):
+	    for match in re.finditer(pattern, line):
+		    avgTimeArray.append(line.split(', time ')[1].split('ms')[0])
+    avgTime = [int(i) for i in avgTimeArray]
+    logging.info('PingThread: Avg response time (in ms): ' + str(avgTime))
 
-	# Updating All the Preferences
-	for key in server_map:
-		server_map[key] = (0.75*loss[IPAddresses.index(key)]) + (0.25*avgTime[IPAddresses.index(key)])
+    # Updating All the Preferences
+    for key in server_map:
+        server_map[key] = (0.75*loss[IPAddresses.index(key)]) + (0.25*avgTime[IPAddresses.index(key)])
 
-	delete_file_in_cwd(fileErr)
-	delete_file_in_cwd(fileOut)
+    delete_file_in_cwd(fileErr)
+    delete_file_in_cwd(fileOut)
 
 def find_best_server_ip():
     global server_map
