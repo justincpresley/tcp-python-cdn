@@ -1,5 +1,4 @@
-<h1>Python Content Delivery Network
-<h6>
+<h1>Python Content Delivery Network</h1>
 
 There are three different programs included that all must be used in order to model a CDN.
 A **client**, **loadbalancer**, and a **server**. There can be multiple clients and servers. Also note,
@@ -16,8 +15,7 @@ This is for Starting the programs. Please view the Shutdown portion as well.
 
 
 
-<h2>Client - (should be started last)
-<h6>  
+<h2>Client - (should be started last)</h2>
   syntax:  "python3 client.py -s SERVER -p PORT -l LOGFILE"
   example: "python3 client.py -s 196.24.12.12 -p 33000 -l log"
 
@@ -29,8 +27,7 @@ This is for Starting the programs. Please view the Shutdown portion as well.
   there has yet to be any servers up.
 
 
-<h2>Load Balancer - (best to start after servers are up)
-<h6>
+<h2>Load Balancer - (best to start after servers are up)</h2>
   syntax:  "python3 loadbalancer.py -s SERVERS -p PORT -l LOGFILE"
   example: "python3 loadbalancer.py -s servers.txt -p 33000 -l log"
 
@@ -42,8 +39,7 @@ This is for Starting the programs. Please view the Shutdown portion as well.
   Notes: Update servers.txt with all the ips of the servers you want to use before you run this.
 
 
-<h2>Servers - (best to start first)
-<h6>  
+<h2>Servers - (best to start first)</h2>
   syntax:  "python3 replicaserver.py -p PORT -l LOGFILE -w WEBPAGE"
   example: "python3 replicaserver.py -p 33000 -l log -w www.nytimes.com"
 
@@ -56,8 +52,7 @@ This is for Starting the programs. Please view the Shutdown portion as well.
 
 
 
-<h2>SHUTING DOWN THE PROGRAMS PROPERLY
-<h6>  
+<h2>SHUTING DOWN THE PROGRAMS PROPERLY</h2>
 The Best way to shut down this network is to hit "CTRL C" once or send a keyboard interruption once
 to the loadbalancer.py. This will stop severing new clients, but still server the remaining clients.
 
