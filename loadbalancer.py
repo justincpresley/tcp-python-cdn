@@ -96,7 +96,7 @@ class PingThread(threading.Thread):
         finally:
             pass
     def stop(self):
-        self.runing = False
+        self.running = False
 
 def main():
     # Command line parser
