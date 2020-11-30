@@ -50,6 +50,8 @@ def main():
         packet = receive_packet(sourceSock)
         pref_server_ip = payload_from_packet(packet).decode()
         logging.info(f'Client: received {pref_server_ip}')
+    except:
+        logging.info(f'Client: stopping...')
     finally:
     # Close socket
         logging.info(f'Client: stopping socket to load balancer')
@@ -82,6 +84,8 @@ def main():
                 flag = True
                 send_packet(sourceSock, form_packet(ack_num_from_packet(packet), seq_num_from_packet(packet)+sys.getsizeof(payload_from_packet(packet)),b'',ack=True, fin=True))
             logging.info(f'SEND   {ack_num_from_packet(packet)} {seq_num_from_packet(packet)+sys.getsizeof(payload_from_packet(packet))} ACK={"Y "if True else "N"} SYN={"Y" if False else "N"} FIN={"Y" if True else "N"}')
+    except:
+        logging.info(f'Client: stopping...')
     finally:
     # Close socket
         logging.info(f'Client: stopping socket to prefered server')
