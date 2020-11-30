@@ -44,7 +44,7 @@ This is for Starting the programs. Please view the Shutdown portion as well.<br>
   The *PORT* should be the port used on all the servers and the loadbalancer and what ip the client uses to connect.<br>
   The *LOGFILE* can be named anything as it is a file created on host, log is preferred.<br>
   <br>
-  Notes: Update servers.txt with all the ips of the servers you want to use before you run this.
+  Notes: **Update servers.txt** with all the ips of the servers you want to use before you run this.
 
 ---
 
