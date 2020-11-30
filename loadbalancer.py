@@ -21,7 +21,7 @@ def update_server_map():
     # Ping All the Addresses
     with open(fileOut,"wb") as out, open(fileErr,"wb") as err:
         for i in range(len(IPAddresses)):
-		    subprocess.run('ping -c 4 ' + IPAddresses[i], stdout=out, stderr=err, shell=True)
+            subprocess.run('ping -c 4 ' + IPAddresses[i], stdout=out, stderr=err, shell=True)
 
     # Finding All the Losses
     lossArray = []
@@ -51,7 +51,7 @@ def update_server_map():
 def find_best_server_ip():
     global server_map
     best_ip = "0.0.0.0"
-    best_pref = 0.0
+    best_pref = 0.00
     for key in server_map:
         if server_map[key] != 0.0:
             if best_ip != 0.00:
@@ -73,6 +73,7 @@ class ClientThread(threading.Thread):
     def run(self):
         best_ip = find_best_server_ip()
         while best_ip=="0.0.0.0":
+            logging.info(f'ClientThread: Found the best server as '0.0.0.0', retrying...')
             time.sleep(5)
             best_ip = find_best_server_ip()
         data = best_ip.encode('utf-8')
