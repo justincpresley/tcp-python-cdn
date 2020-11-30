@@ -72,16 +72,10 @@ This is for Starting the programs. Please view the Shutdown portion as well.
 
 <h2>SHUTING DOWN THE PROGRAMS PROPERLY</h2>
 
-The Best way to shut down this network is to hit "CTRL C" once or send a keyboard interruption once
-to the loadbalancer.py. This will stop severing new clients, but still server the remaining clients.
-
-
-After this, you can shut down each server with one "CRTL C" or a keyboard interruption. This will, like the
-loadbalancer.py, stop any new clients from coming in. However, it will finish serving the remaining clients.
-
-
-After all that, you can close the client.py with "CRTL C" or a keyboard interruption.
-
-
-
-
+The Best way to shut down this network is to hit "CTRL C" once or send a **keyboard interruption** once
+to the **loadbalancer.py**. This will stop severing new clients, but still server the remaining clients.<br>
+<br>
+After this, you can shut down each server with one "CRTL C" or a **keyboard interruption**. This will, like the
+loadbalancer.py, stop any new clients from coming in. However, it will finish serving the remaining clients for each **server.py**.<br>
+<br>
+After all that, you can close the **client.py** with "CRTL C" or a **keyboard interruption**.
