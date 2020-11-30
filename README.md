@@ -23,8 +23,7 @@ The **Client** is used to contact a loadbalancer.
 Below is the appropriate commands and notes for each part.
 This is for Starting the programs. Please view the Shutdown portion as well.
 
-
-
+---
 
 <h2>Client - (should be started last)</h2>
 
@@ -39,6 +38,7 @@ This is for Starting the programs. Please view the Shutdown portion as well.
   Notes: LoadBalancer needs to at least be up. It will wait infinitely if
   there has yet to be any servers up.
 
+---
 
 <h2>Load Balancer - (best to start after servers are up)</h2>
 
@@ -53,6 +53,7 @@ This is for Starting the programs. Please view the Shutdown portion as well.
   <br>
   Notes: Update servers.txt with all the ips of the servers you want to use before you run this.
 
+---
 
 <h2>Servers - (best to start first)</h2>
 
@@ -66,7 +67,7 @@ This is for Starting the programs. Please view the Shutdown portion as well.
   <br>
   Notes: None.
 
-
+---
 
 
 <h2>SHUTING DOWN THE PROGRAMS PROPERLY</h2>
