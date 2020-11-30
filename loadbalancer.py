@@ -54,7 +54,7 @@ def find_best_server_ip():
     best_pref = 0.00
     for key in server_map:
         if server_map[key] != 0.0:
-            if best_ip != 0.00:
+            if best_pref != 0.00:
                 if server_map[key] < best_pref:
                     best_pref = server_map[key]
                     best_ip = key
@@ -73,7 +73,7 @@ class ClientThread(threading.Thread):
     def run(self):
         best_ip = find_best_server_ip()
         while best_ip=="0.0.0.0":
-            logging.info(f'ClientThread: Found the best server as '0.0.0.0', retrying...')
+            logging.info(f'ClientThread: Found the best server as "0.0.0.0", retrying...')
             time.sleep(5)
             best_ip = find_best_server_ip()
         data = best_ip.encode('utf-8')
@@ -92,7 +92,7 @@ class PingThread(threading.Thread):
                 update_server_map()
                 logging.info(f'PingThread: Server Preferences are Updated')
                 logging.info(f'PingThread: {server_map}')
-                time.sleep(10) # in seconds how long to wait
+                time.sleep(3) # in seconds how long to wait
         finally:
             pass
     def stop(self):
