@@ -21,7 +21,6 @@ The **Client** is used to contact a loadbalancer.
 
 
 Below is the appropriate commands and notes for each part.
-
 This is for Starting the programs. Please view the Shutdown portion as well.
 
 
@@ -35,7 +34,9 @@ This is for Starting the programs. Please view the Shutdown portion as well.
   
 
   The SERVER should be the ip of the loadbalancer that you are using.
+  
   The PORT should be the port used on all the servers and the loadbalancer and what ip the client uses to connect.
+  
   The LOGFILE can be named anything as it is a file created on host, log is preferred.
 
 
@@ -52,7 +53,9 @@ This is for Starting the programs. Please view the Shutdown portion as well.
 
   The SERVERS should be the file that contains all the ips of the servers.
   (servers.txt is included and should be used)
+  
   The PORT should be the port used on all the servers and the loadbalancer and what ip the client uses to connect.
+  
   The LOGFILE can be named anything as it is a file created on host, log is preferred.
 
 
@@ -67,7 +70,9 @@ This is for Starting the programs. Please view the Shutdown portion as well.
 
 
   The PORT should be the port used on all the servers and the loadbalancer and what ip the client uses to connect.
+  
   The LOGFILE can be named anything as it is a file created on host, log is preferred.
+  
   The WEBPAGE is the webpage you what the server to server.
   
 
