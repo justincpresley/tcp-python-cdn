@@ -79,7 +79,7 @@ class ClientThread(threading.Thread):
             best_ip = find_best_server_ip()
         data = best_ip.encode('utf-8')
         send_packet(self.socket, form_packet(1,1,data,syn=True))
-        logging.info(f'Request from {self.ip} for <URL>. Redirecting to {best_ip}. Preference {server_map[best_ip]}. Next Preference was {server_map[2]} to {best_ip}.')
+        logging.info(f'Request from {self.ip} for <URL>. Redirecting to {best_ip}. Preference {server_map[best_ip]}.')
         logging.info(f'Response from {best_ip} sending request to {self.ip}.')
         self.socket.close()
         logging.info(f'[-] Thread ended for {self.ip}, {str(self.port)}')
