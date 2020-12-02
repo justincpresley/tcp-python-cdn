@@ -71,6 +71,7 @@ class ClientThread(threading.Thread):
         self.socket = socket
         logging.info(f'[+] New thread started for {self.ip}, {str(self.port)}')
     def run(self):
+        global server_map
         best_ip = find_best_server_ip()
         while best_ip=="0.0.0.0":
             logging.info(f'ClientThread: Found the best server as "0.0.0.0", retrying...')
@@ -78,6 +79,8 @@ class ClientThread(threading.Thread):
             best_ip = find_best_server_ip()
         data = best_ip.encode('utf-8')
         send_packet(self.socket, form_packet(1,1,data,syn=True))
+        logging.info(f'Request from {self.ip} for <URL>. Redirecting to {best_ip}. Preference {server_map[best_ip]}. Next Preference was {server_map[2]} to {best_ip}.')
+        logging.info(f'Response from {best_ip} sending request to {self.ip}.')
         self.socket.close()
         logging.info(f'[-] Thread ended for {self.ip}, {str(self.port)}')
 
