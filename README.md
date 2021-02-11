@@ -75,7 +75,7 @@ After all that, you can close the **client.py** with "CRTL C" or a **keyboard in
 
 <h2>License and Authors</h2>
 
-tcp-python-chatroom is an open source project that is licensed. See [`LICENSE.md`](LICENSE.md) for more information.
+tcp-python-cdn is an open source project that is licensed. See [`LICENSE.md`](LICENSE.md) for more information.
 
 The Names of all authors associated with this project are below:
 
