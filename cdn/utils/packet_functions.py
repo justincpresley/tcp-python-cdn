@@ -1,3 +1,8 @@
+#    TCP Content Delivery Network
+#    Author:  Justin C Presley
+#    Github:  https://github.com/embersight
+#    Contact: justincpresley@gmail.com
+
 import socket
 import struct
 from enum import Enum
