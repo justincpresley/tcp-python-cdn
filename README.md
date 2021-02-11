@@ -72,3 +72,11 @@ After this, you can shut down each server with one "CRTL C" or a **keyboard inte
 loadbalancer.py, stop any new clients from coming in. However, it will finish serving the remaining clients for each **server.py**.<br>
 <br>
 After all that, you can close the **client.py** with "CRTL C" or a **keyboard interruption**.
+
+<h2>License and Authors</h2>
+
+tcp-python-chatroom is an open source project that is licensed. See [`LICENSE.md`](LICENSE.md) for more information.
+
+The Names of all authors associated with this project are below:
+
+  * *Justin Presley* (embersight)
