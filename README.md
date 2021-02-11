@@ -1,4 +1,4 @@
-<h1>Python Content Delivery Network</h1>
+<h1>tcp-python-cdn: A Content Delivery Network based on TCP-IP built in python</h1>
 
 
 There are three different programs included that all must be used in order to model a CDN.<br>
