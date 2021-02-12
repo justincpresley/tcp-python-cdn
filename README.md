@@ -79,4 +79,4 @@ tcp-python-cdn is an open source project that is licensed. See [`LICENSE.md`](LI
 
 The Names of all authors associated with this project are below:
 
-  * *Justin Presley* (embersight)
+  * *Justin Presley* (justincpresley)
